@@ -1,25 +1,47 @@
 {
   "name": "@wexample/js-date",
   "version": "1.0.2",
+  "description": "Date parsing, relative wording and localized display, framework-agnostic.",
+  "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run typecheck",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "wexample",
+    "date",
+    "intl",
+    "relative-time"
+  ],
   "publishConfig": {
     "access": "public"
   },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  },
+  "repository": "https://github.com/wexample/js-date",
   "files": [
-    "dist"
+    "src"
   ],
   "exports": {
     "./*": {
-      "types": "./dist/*.d.ts",
-      "default": "./dist/*.js"
+      "types": "./src/*.ts",
+      "default": "./src/*.ts"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
-        "dist/*"
+        "src/*"
       ]
     }
-  },
-  "repository": "https://github.com/wexample/js-date"
+  }
 }
