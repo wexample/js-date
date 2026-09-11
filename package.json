@@ -1,6 +1,6 @@
 {
   "name": "@wexample/js-date",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -20,5 +20,6 @@
         "dist/*"
       ]
     }
-  }
+  },
+  "repository": "https://github.com/wexample/js-date"
 }
