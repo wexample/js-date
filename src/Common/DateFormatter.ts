@@ -12,17 +12,14 @@ import {
   DATE_RELATIVE_AUTO_LIMIT_SECONDS,
   DateInput,
   dateParse,
-  dateRelativeDiff
+  dateRelativeDiff,
 } from '../Helper/Date';
 
 // A format name shared with the PHP side, or an explicit option bag for a shape
 // the named formats do not cover.
 export type DateFormat = string | Intl.DateTimeFormatOptions;
 
-export type DateTranslate = (
-  key: string,
-  parameters: Record<string, string | number>
-) => string;
+export type DateTranslate = (key: string, parameters: Record<string, string | number>) => string;
 
 export type DateResolveLocale = () => string;
 
@@ -39,7 +36,7 @@ const INTL_OPTIONS: Record<string, Intl.DateTimeFormatOptions> = {
   [DATE_DISPLAY_DATE_TIME]: { dateStyle: 'medium', timeStyle: 'short' },
   [DATE_DISPLAY_DATE_TIME_SHORT]: { dateStyle: 'short', timeStyle: 'short' },
   [DATE_DISPLAY_DATE_TIME_FULL]: { dateStyle: 'full', timeStyle: 'medium' },
-  [DATE_DISPLAY_MONTH_YEAR]: { year: 'numeric', month: 'long' }
+  [DATE_DISPLAY_MONTH_YEAR]: { year: 'numeric', month: 'long' },
 };
 
 /**
@@ -56,8 +53,7 @@ export default class DateFormatter {
   constructor(
     private readonly translate: DateTranslate,
     private readonly resolveLocale: DateResolveLocale
-  ) {
-  }
+  ) {}
 
   format(
     value: DateInput,
@@ -76,9 +72,8 @@ export default class DateFormatter {
     if (format === DATE_DISPLAY_AUTO) {
       const distance = Math.abs(reference.getTime() - date.getTime()) / 1000;
 
-      format = distance < DATE_RELATIVE_AUTO_LIMIT_SECONDS
-        ? DATE_DISPLAY_RELATIVE
-        : DATE_DISPLAY_DATE;
+      format =
+        distance < DATE_RELATIVE_AUTO_LIMIT_SECONDS ? DATE_DISPLAY_RELATIVE : DATE_DISPLAY_DATE;
     }
 
     if (format === DATE_DISPLAY_RELATIVE) {
@@ -89,9 +84,7 @@ export default class DateFormatter {
   }
 
   formatAbsolute(date: Date, format: DateFormat, locale?: string): string {
-    const options = typeof format === 'string'
-      ? INTL_OPTIONS[format]
-      : format;
+    const options = typeof format === 'string' ? INTL_OPTIONS[format] : format;
 
     return new Intl.DateTimeFormat(locale || this.resolveLocale(), options).format(date);
   }
@@ -110,9 +103,10 @@ export default class DateFormatter {
       return this.translate(DATE_RELATIVE_KEY_NOW, {});
     }
 
-    const key = DATE_RELATIVE_KEY_PREFIX
-      + (diff.past ? 'past' : 'future')
-      + `.${diff.unit}_${diff.count === 1 ? 'one' : 'other'}`;
+    const key =
+      DATE_RELATIVE_KEY_PREFIX +
+      (diff.past ? 'past' : 'future') +
+      `.${diff.unit}_${diff.count === 1 ? 'one' : 'other'}`;
 
     return this.translate(key, { '%count%': diff.count });
   }

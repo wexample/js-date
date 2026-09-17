@@ -1,13 +1,6 @@
 export type DateInput = Date | string | number | null | undefined;
 
-export type DateRelativeUnit =
-  | 'now'
-  | 'minute'
-  | 'hour'
-  | 'day'
-  | 'week'
-  | 'month'
-  | 'year';
+export type DateRelativeUnit = 'now' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 export type DateRelativeDiff = {
   unit: DateRelativeUnit;
@@ -36,7 +29,7 @@ export const DATE_RELATIVE_UNIT_SECONDS: Record<Exclude<DateRelativeUnit, 'now'>
   // Averaged, so that "3 months ago" does not shift with the length of the
   // months it happens to span.
   month: 2629800,
-  year: 31557600
+  year: 31557600,
 };
 
 // Read as: below this many seconds of distance, count in that unit. Past the
@@ -47,7 +40,7 @@ export const DATE_RELATIVE_LADDER: [number, DateRelativeUnit][] = [
   [86400, 'hour'],
   [604800, 'day'],
   [2629800, 'week'],
-  [31557600, 'month']
+  [31557600, 'month'],
 ];
 
 // Where `auto` stops counting backwards and shows a calendar date instead.
@@ -62,7 +55,7 @@ export const DATE_RELATIVE_REFRESH_SECONDS: Record<DateRelativeUnit, number> = {
   day: 3600,
   week: 3600,
   month: 3600,
-  year: 3600
+  year: 3600,
 };
 
 export function dateParse(value: DateInput): Date | null {
@@ -94,10 +87,9 @@ export function dateRelativeDiff(seconds: number): DateRelativeDiff {
     if (elapsed < limit) {
       return {
         unit,
-        count: unit === 'now'
-          ? 0
-          : Math.max(1, Math.round(elapsed / DATE_RELATIVE_UNIT_SECONDS[unit])),
-        past
+        count:
+          unit === 'now' ? 0 : Math.max(1, Math.round(elapsed / DATE_RELATIVE_UNIT_SECONDS[unit])),
+        past,
       };
     }
   }
@@ -105,6 +97,6 @@ export function dateRelativeDiff(seconds: number): DateRelativeDiff {
   return {
     unit: 'year',
     count: Math.max(1, Math.round(elapsed / DATE_RELATIVE_UNIT_SECONDS.year)),
-    past
+    past,
   };
 }
