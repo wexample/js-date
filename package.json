@@ -1,6 +1,6 @@
 {
   "name": "@wexample/js-date",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Date parsing, relative wording and localized display, framework-agnostic.",
   "license": "MIT",
   "type": "module",
