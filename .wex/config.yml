@@ -5,7 +5,7 @@ git:
 global:
   name: js-date
   type: javascript-package
-  version: 1.0.5
+  version: 1.0.6
 wex:
   migration: 7
   version: 6.0.136
