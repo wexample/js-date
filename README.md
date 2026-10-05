@@ -1,6 +1,6 @@
 # @wexample/js-date
 
-Version: 1.0.7
+Version: 1.0.8
 
 The repository does not provide any concrete code that could be documented for now.
 
