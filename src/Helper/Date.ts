@@ -19,6 +19,8 @@ export const DATE_DISPLAY_DATE_TIME_SHORT = 'date_time_short';
 export const DATE_DISPLAY_DATE_TIME_FULL = 'date_time_full';
 export const DATE_DISPLAY_MONTH_YEAR = 'month_year';
 export const DATE_DISPLAY_RELATIVE = 'relative';
+export const DATE_DISPLAY_WEEK = 'week';
+export const DATE_DISPLAY_WEEK_RANGE = 'week_range';
 export const DATE_DISPLAY_AUTO = 'auto';
 
 export const DATE_RELATIVE_UNIT_SECONDS: Record<Exclude<DateRelativeUnit, 'now'>, number> = {
@@ -99,4 +101,67 @@ export function dateRelativeDiff(seconds: number): DateRelativeDiff {
     count: Math.max(1, Math.round(elapsed / DATE_RELATIVE_UNIT_SECONDS.year)),
     past,
   };
+}
+
+const DAY_MS = 86400000;
+
+// ISO weeks, whatever the locale: they start on Monday, and the first one holds
+// the year's first Thursday — so 30 Dec 2025 belongs to 2026-W01. The same rule
+// as the PHP helper's, which is what lets a week key travel between the two.
+function dateIsoThursday(date: Date): Date {
+  const thursday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  thursday.setDate(thursday.getDate() + 3 - ((thursday.getDay() + 6) % 7));
+
+  return thursday;
+}
+
+export function dateWeekYear(date: Date): number {
+  return dateIsoThursday(date).getFullYear();
+}
+
+export function dateWeekNumber(date: Date): number {
+  const thursday = dateIsoThursday(date);
+  const firstThursday = dateIsoThursday(new Date(thursday.getFullYear(), 0, 4));
+
+  return 1 + Math.round((thursday.getTime() - firstThursday.getTime()) / (7 * DAY_MS));
+}
+
+// `2026-W29`, the value an `<input type="week">` posts.
+export function dateWeekKey(date: Date): string {
+  return `${dateWeekYear(date)}-W${String(dateWeekNumber(date)).padStart(2, '0')}`;
+}
+
+// The Monday of a week key, or null for a key naming no week (`2025-W53`).
+export function dateFromWeekKey(weekKey: string): Date | null {
+  const match = /^(\d{4})-W(\d{2})$/.exec(weekKey);
+
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const week = Number(match[2]);
+  const monday = dateStartOfWeek(new Date(year, 0, 4));
+
+  monday.setDate(monday.getDate() + (week - 1) * 7);
+
+  return week >= 1 && dateWeekYear(monday) === year && dateWeekNumber(monday) === week ? monday : null;
+}
+
+export function dateStartOfWeek(date: Date): Date {
+  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+
+  return monday;
+}
+
+export function dateEndOfWeek(date: Date): Date {
+  const sunday = dateStartOfWeek(date);
+
+  sunday.setDate(sunday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 0);
+
+  return sunday;
 }

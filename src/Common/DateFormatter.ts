@@ -9,10 +9,15 @@ import {
   DATE_DISPLAY_MONTH_YEAR,
   DATE_DISPLAY_RELATIVE,
   DATE_DISPLAY_TIME,
+  DATE_DISPLAY_WEEK,
+  DATE_DISPLAY_WEEK_RANGE,
   DATE_RELATIVE_AUTO_LIMIT_SECONDS,
   DateInput,
   dateParse,
+  dateEndOfWeek,
   dateRelativeDiff,
+  dateStartOfWeek,
+  dateWeekNumber,
 } from '../Helper/Date';
 
 // A format name shared with the PHP side, or an explicit option bag for a shape
@@ -25,6 +30,16 @@ export type DateResolveLocale = () => string;
 
 export const DATE_RELATIVE_KEY_NOW = 'date.relative.now';
 export const DATE_RELATIVE_KEY_PREFIX = 'date.relative.';
+// `%week%`, plus `%range%` for the range form: « Week %week% · %range% ».
+export const DATE_WEEK_KEY = 'date.week.label';
+export const DATE_WEEK_RANGE_KEY = 'date.week.range';
+
+// The day and month of either end of a range, the year joining them only when
+// the range crosses one — the PHP formatter's `dMMM` and `dMMMy` skeletons.
+const RANGE_OPTIONS: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+const RANGE_OPTIONS_YEAR: Intl.DateTimeFormatOptions = { ...RANGE_OPTIONS, year: 'numeric' };
+const RANGE_SEPARATOR_DAYS = '–';
+const RANGE_SEPARATOR_DATES = ' – ';
 
 // The counterpart of the PHP formatter's ICU date and time styles: the same
 // notion, spelled the way the browser spells it.
@@ -80,7 +95,58 @@ export default class DateFormatter {
       return this.formatRelative(date, reference);
     }
 
+    if (format === DATE_DISPLAY_WEEK || format === DATE_DISPLAY_WEEK_RANGE) {
+      return this.formatWeek(date, format === DATE_DISPLAY_WEEK_RANGE, locale);
+    }
+
     return this.formatAbsolute(date, format, locale);
+  }
+
+  /**
+   * The ISO week holding the date: « Week 29 », or « Week 29 · 14–20 Jul » with
+   * its Monday-to-Sunday bounds.
+   */
+  formatWeek(date: Date, withRange: boolean = false, locale?: string): string {
+    const parameters: Record<string, string | number> = { '%week%': dateWeekNumber(date) };
+
+    if (!withRange) {
+      return this.translate(DATE_WEEK_KEY, parameters);
+    }
+
+    parameters['%range%'] = this.formatDayRange(dateStartOfWeek(date), dateEndOfWeek(date), locale);
+
+    return this.translate(DATE_WEEK_RANGE_KEY, parameters);
+  }
+
+  /**
+   * Two days as one range, what they share written once: « 14–20 Jul »,
+   * « 28 Jul – 3 Aug », « 29 Dec 2025 – 4 Jan 2026 », in the locale's order.
+   *
+   * Built the way the PHP formatter builds it, from the locale's own
+   * day-and-month form, rather than through `formatRange()`: the browser's
+   * interval formatter spaces its dash differently, and a date the server wrote
+   * must not change shape when the browser redraws it.
+   */
+  formatDayRange(start: Date, end: Date, locale?: string): string {
+    const resolved = locale || this.resolveLocale();
+    const sameYear = start.getFullYear() === end.getFullYear();
+    const formatter = new Intl.DateTimeFormat(resolved, sameYear ? RANGE_OPTIONS : RANGE_OPTIONS_YEAR);
+
+    if (sameYear && start.getMonth() === end.getMonth()) {
+      // The end date written once, its day preceded by the first one — the bare
+      // day field, read from the same form so a locale adding a unit to it
+      // (`13日`) does not write that unit twice.
+      const startDay = formatter.formatToParts(start).find((part) => part.type === 'day')?.value ?? '';
+
+      return formatter
+        .formatToParts(end)
+        .map((part) =>
+          part.type === 'day' ? startDay + RANGE_SEPARATOR_DAYS + part.value : part.value
+        )
+        .join('');
+    }
+
+    return formatter.format(start) + RANGE_SEPARATOR_DATES + formatter.format(end);
   }
 
   formatAbsolute(date: Date, format: DateFormat, locale?: string): string {
