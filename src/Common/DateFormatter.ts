@@ -130,13 +130,17 @@ export default class DateFormatter {
   formatDayRange(start: Date, end: Date, locale?: string): string {
     const resolved = locale || this.resolveLocale();
     const sameYear = start.getFullYear() === end.getFullYear();
-    const formatter = new Intl.DateTimeFormat(resolved, sameYear ? RANGE_OPTIONS : RANGE_OPTIONS_YEAR);
+    const formatter = new Intl.DateTimeFormat(
+      resolved,
+      sameYear ? RANGE_OPTIONS : RANGE_OPTIONS_YEAR
+    );
 
     if (sameYear && start.getMonth() === end.getMonth()) {
       // The end date written once, its day preceded by the first one — the bare
       // day field, read from the same form so a locale adding a unit to it
       // (`13日`) does not write that unit twice.
-      const startDay = formatter.formatToParts(start).find((part) => part.type === 'day')?.value ?? '';
+      const startDay =
+        formatter.formatToParts(start).find((part) => part.type === 'day')?.value ?? '';
 
       return formatter
         .formatToParts(end)

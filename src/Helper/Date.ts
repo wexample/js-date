@@ -146,7 +146,9 @@ export function dateFromWeekKey(weekKey: string): Date | null {
 
   monday.setDate(monday.getDate() + (week - 1) * 7);
 
-  return week >= 1 && dateWeekYear(monday) === year && dateWeekNumber(monday) === week ? monday : null;
+  return week >= 1 && dateWeekYear(monday) === year && dateWeekNumber(monday) === week
+    ? monday
+    : null;
 }
 
 export function dateStartOfWeek(date: Date): Date {
