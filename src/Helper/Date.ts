@@ -11,6 +11,8 @@ export type DateRelativeDiff = {
 // The vocabulary a display asks for, shared with the PHP side so that a format
 // named in a template means the same thing once the browser takes over.
 export const DATE_DISPLAY_TIME = 'time';
+// The time to the second: a console, a log, anything read as it happens.
+export const DATE_DISPLAY_TIME_SECONDS = 'time_seconds';
 export const DATE_DISPLAY_DATE = 'date';
 export const DATE_DISPLAY_DATE_SHORT = 'date_short';
 export const DATE_DISPLAY_DATE_LONG = 'date_long';

@@ -9,6 +9,7 @@ import {
   DATE_DISPLAY_MONTH_YEAR,
   DATE_DISPLAY_RELATIVE,
   DATE_DISPLAY_TIME,
+  DATE_DISPLAY_TIME_SECONDS,
   DATE_DISPLAY_WEEK,
   DATE_DISPLAY_WEEK_RANGE,
   DATE_RELATIVE_AUTO_LIMIT_SECONDS,
@@ -45,6 +46,7 @@ const RANGE_SEPARATOR_DATES = ' – ';
 // notion, spelled the way the browser spells it.
 const INTL_OPTIONS: Record<string, Intl.DateTimeFormatOptions> = {
   [DATE_DISPLAY_TIME]: { timeStyle: 'short' },
+  [DATE_DISPLAY_TIME_SECONDS]: { timeStyle: 'medium' },
   [DATE_DISPLAY_DATE]: { dateStyle: 'medium' },
   [DATE_DISPLAY_DATE_SHORT]: { dateStyle: 'short' },
   [DATE_DISPLAY_DATE_LONG]: { dateStyle: 'long' },
