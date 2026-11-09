@@ -1,6 +1,6 @@
 # @wexample/js-date
 
-Version: 2.0.7
+Version: 3.0.0
 
 Date parsing, relative wording and localized display, framework-agnostic.
 
